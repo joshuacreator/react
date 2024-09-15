@@ -15,10 +15,12 @@ const LibraryPage = () => {
       try {
         const results = await searchBooks("popular");
         setBooks(results);
+        console.log(books);
       } catch (error) {
         console.error(error);
       } finally {
         setIsLoading(false);
+        console.log(books);
       }
     };
     fetchBooks();
