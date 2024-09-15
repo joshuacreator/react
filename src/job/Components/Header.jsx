@@ -26,10 +26,10 @@ function Header({ page }) {
                   <a href="/">Home</a>
                 </li>
                 <li className={page == "JobList" ? "active" : null}>
-                  <a href="/joblist">Job list</a>
+                  <a href="/job-list">Job list</a>
                 </li>
                 <li className={page == "Details" ? "active" : null}>
-                  <a href="/jobdetail">Job Details</a>
+                  <a href="/job-detail">Job Details</a>
                 </li>
                 <li className={page == "Resume" ? "active" : null}>
                   <a href="/resume">Resume</a>
