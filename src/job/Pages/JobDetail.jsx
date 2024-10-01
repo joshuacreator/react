@@ -1,7 +1,32 @@
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import HeaderComp from "../Components/Header";
 import FooterComp from "../Components/Footer";
+import { useParams } from "react-router-dom";
+import { config, jobData } from "../Components/GeneralFunction";
 
 function JobDetail() {
+  let param = useParams();
+
+  const [content, setContent] = useState(jobData[param.id]);
+  console.log(content);
+
+  const FetchJobs = () => {
+    let url = "https://get_data_url/" + param.id;
+
+    axios
+      .get(url, config)
+      .then((response) => {
+        setContent(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    // FetchJobs();
+  }, []);
   return (
     <div>
       <HeaderComp page="Details" />
@@ -11,10 +36,10 @@ function JobDetail() {
           <div className="breadcrumb-section">
             <ol className="breadcrumb">
               <li>
-                <a href="index.html">Home</a>
+                <a href="/home">Home</a>
               </li>
               <li>
-                <a href="job-list.html">Engineer/Architects</a>
+                <a href="/job-list">Engineer/Architects</a>
               </li>
               <li>UI & UX Designer</li>
             </ol>
@@ -89,10 +114,10 @@ function JobDetail() {
                   <span>
                     <span>
                       <a href="#" className="title">
-                        Human Resource Manager
+                        {content.title}
                       </a>
                     </span>{" "}
-                    @ <a href="#"> Dropbox Inc</a>
+                    @ <a href="#"> {content.company}</a>
                   </span>
                   <div className="ad-meta">
                     <ul>
@@ -102,23 +127,23 @@ function JobDetail() {
                             className="fa fa-map-marker"
                             aria-hidden="true"
                           ></i>
-                          San Francisco, CA, US
+                          {content.location}
                         </a>
                       </li>
                       <li>
                         <a href="#">
                           <i className="fa fa-clock-o" aria-hidden="true"></i>
-                          Full Time
+                          {content.level}
                         </a>
                       </li>
                       <li>
                         <i className="fa fa-money" aria-hidden="true"></i>
-                        $25,000 - $35,000
+                        ${content.min_pay} - ${content.max_pay}
                       </li>
                       <li>
                         <a href="#">
                           <i className="fa fa-tags" aria-hidden="true"></i>
-                          HR/Org. Development
+                          {content.department}
                         </a>
                       </li>
                       <li>
@@ -386,7 +411,7 @@ function JobDetail() {
               <h4>
                 Post your Resume for free on <a href="#">Jobs.com</a>
               </h4>
-              <a href="post-resume.html" className="btn btn-primary">
+              <a href="post-resume" className="btn btn-primary">
                 Add Your Resume
               </a>
             </div>

@@ -1,8 +1,21 @@
 import Header from "../Components/Header.jsx";
 import Footer from "../Components/Footer.jsx";
 import UserCard from "../Components/UserCard.jsx";
+import Cookies from "js-cookies";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
+  const navigator = useNavigate();
+
+  const Token = Cookies.getItem("token");
+
+  useEffect(() => {
+    if (Token === undefined || Token === null || Token === "") {
+      navigator("/signin");
+    }
+  }, []);
+
   return (
     <div>
       <Header page="profile" />

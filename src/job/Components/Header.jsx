@@ -17,13 +17,13 @@ function Header({ page }) {
                 <i className="fa fa-align-justify"></i>
               </span>
             </button>
-            <a className="navbar-brand" href="/">
-              <img className="img-fluid" src="images/logo.png" alt="Logo" />
+            <a className="navbar-brand" href="/home">
+              <img className="img-fluid" src="/images/logo.png" alt="Logo" />
             </a>
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="nav navbar-nav">
                 <li className={page == "Home" ? "active" : null}>
-                  <a href="/">Home</a>
+                  <a href="/home">Home</a>
                 </li>
                 <li className={page == "JobList" ? "active" : null}>
                   <a href="/job-list">Job list</a>

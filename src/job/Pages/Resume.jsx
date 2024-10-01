@@ -1,4 +1,6 @@
 import Header from "../Components/Header";
+import UserProfile from "../Components/UserProfile";
+import Profile from "./Profile";
 
 function Resume() {
   return (
@@ -15,34 +17,16 @@ function Resume() {
             </ol>
             <h2 className="title">Jhon Doe Resume</h2>
           </div>
+
           <div className="resume-content">
-            <div className="profile section clearfix">
-              <div className="profile-logo">
-                <img
-                  className="img-fluid"
-                  src="images/job/resume.jpg"
-                  alt="Image"
-                />
-              </div>
-              <div className="profile-info">
-                <h1>Jhon Doe</h1>
-                <address>
-                  <p>
-                    Address: 123 West 12th Street, Suite 456 New York, NY 123456{" "}
-                    <br /> Phone: +012 345 678 910 <br /> Email:
-                    <a href="#">
-                      {" "}
-                      <span
-                        className="__cf_email__"
-                        data-cfemail="167f62657b73566563646c7f7a737173737d3875797b"
-                      >
-                        [email&#160;protected]
-                      </span>
-                    </a>
-                  </p>
-                </address>
-              </div>
-            </div>
+            <UserProfile
+              img="images/job/resume.jpg"
+              name="Joshua"
+              address="This is my address at 123 Street"
+              phone="08118660076"
+              email={" myemail@myemail.myemail"}
+            />
+
             <div className="career-objective section">
               <div className="icons">
                 <i className="fa fa-black-tie" aria-hidden="true"></i>

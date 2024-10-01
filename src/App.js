@@ -2,6 +2,8 @@ import "./css/custom.css";
 import "./css/style.css";
 import "./css/Library.css";
 import Contact from "./directory/contact";
+import { ReactNotifications } from "react-notifications-component";
+import "react-notifications-component/dist/theme.css";
 
 import List from "./movie/List";
 
@@ -33,6 +35,8 @@ import {
 function App() {
   return (
     <div>
+      <ReactNotifications />
+
       <Router>
         <Routes>
           <Route path="/" element={<List />} />
@@ -45,7 +49,7 @@ function App() {
 
           <Route path="/home" element={<Home />} />
           <Route path="/job-list" element={<JobList />} />
-          <Route path="/job-details" element={<JobDetails />} />
+          <Route path="/job-details/:id" element={<JobDetails />} />
           <Route path="/resume" element={<Resume />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/post-resume" element={<PostResume />} />
