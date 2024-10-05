@@ -1,25 +1,121 @@
+import React, { useState } from "react";
+
 import HeaderComp from "../Components/Header";
 import FooterComp from "../Components/Footer";
+import { config } from "../Components/GeneralFunction";
+import Notify from "../Components/Notify";
+
+import { useNavigate } from "react-router-dom";
+
+import axios from "axios";
+import Swal from "sweetalert2";
 
 function JobPost() {
+  const navigator = useNavigate();
+
+  const [post, setPost] = useState({
+    jobCategory: "",
+    jobType: "",
+    jobTitle: "",
+    jobDescription: "",
+    jobLocation: "",
+    jobMinSalary: "",
+    jobMaxSalary: "",
+    experience: "",
+    jobFunction: "",
+    industry: "",
+    companyName: "",
+    companyEmailAddress: "",
+    companyPhoneNumber: "",
+    companyAddress: "",
+  });
+
+  const handleChange = (event) => {
+    let { name, value } = event.target;
+
+    setPost({ ...post, [name]: value });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    Swal.fire({
+      imageUrl: "/images/logo.png",
+      imageHeight: 200,
+    });
+
+    const fd = new FormData();
+
+    // fd.append("slug", post.);
+    // fd.append("category_code", post.);
+    // fd.append("company_code", post.);
+    fd.append("job_type", post.jobType);
+    fd.append("experience", post.experience);
+    fd.append("description", post.jobDescription);
+    // fd.append("fees", post.);
+    // fd.append("staff", post.);
+    fd.append("location", post.jobLocation);
+    fd.append("min_salary", post.jobMinSalary);
+    fd.append("max_salary", post.jobMaxSalary);
+    // fd.append("closing_date", post.);
+    fd.append("title", post.jobTitle);
+
+    let url = "http://solidrockschool.com.ng/api/job/add";
+
+    axios
+      .post(url, fd, config)
+      .then((response) => {
+        if (response.data.status == 200) {
+          Notify({
+            title: "Job created successfully",
+            msg: response.data.message,
+            type: "success",
+          });
+
+          // Cookies.setItem("email", user.email_address);
+
+          // Cookies.setItem("token", response.data.token, {
+          //   expires: response.data.expires_in,
+          // });
+
+          // navigator("/profile");
+        } else {
+          Notify({
+            title: "Error",
+            msg: response.data.message,
+            type: "danger",
+          });
+        }
+      })
+      .catch((error) => {
+        Notify({
+          title: "Unexpected error",
+          msg: `An unexpected error occurred: ${error}`,
+          type: "danger",
+        });
+      });
+  };
+
   return (
     <div>
       <HeaderComp page="post" />
+
       <section className=" job-bg ad-details-page">
         <div className="container">
           <div className="breadcrumb-section">
             <ol className="breadcrumb">
               <li>
-                <a href="/">Home</a>
+                <a href="/home">Home</a>
               </li>
               <li>Job Post </li>
             </ol>
             <h2 className="title">Post Your Job</h2>
           </div>
+
           <div className="job-postdetails">
             <div className="row">
               <div className="col-lg-8">
-                <form action="#">
+                <form action="#" onSubmit={handleSubmit}>
                   <fieldset>
                     <div className="section postdetails">
                       <h4>
@@ -99,13 +195,16 @@ function JobPost() {
                       </div>
                       <div className="row form-group">
                         <label className="col-sm-3 label-title">
-                          Title for your jonb<span className="required">*</span>
+                          Title for your job<span className="required">*</span>
                         </label>
                         <div className="col-sm-9">
                           <input
                             type="text"
                             className="form-control"
                             placeholder="ex, Human Resource Manager"
+                            name="jobTitle"
+                            value={post.jobTitle}
+                            onChange={handleChange}
                           />
                         </div>
                       </div>
@@ -119,6 +218,9 @@ function JobPost() {
                             id="textarea"
                             placeholder="Write few lines about your jobs"
                             rows="8"
+                            name="jobDescription"
+                            onChange={handleChange}
+                            value={post.jobDescription}
                           ></textarea>
                         </div>
                       </div>
@@ -192,12 +294,18 @@ function JobPost() {
                             type="text"
                             className="form-control"
                             placeholder="Min"
+                            name="jobMinSalary"
+                            onChange={handleChange}
+                            value={post.jobMinSalary}
                           />
                           <span>-</span>
                           <input
                             type="text"
                             className="form-control"
                             placeholder="Max"
+                            name="jobMaxSalary"
+                            onChange={handleChange}
+                            value={post.jobMaxSalary}
                           />
                           <input
                             type="radio"
@@ -279,6 +387,9 @@ function JobPost() {
                             type="text"
                             className="form-control"
                             placeholder="human, reosurce, job, hrm"
+                            name="jobFunction"
+                            onChange={handleChange}
+                            value={post.jobFunction}
                           />
                         </div>
                       </div>
@@ -292,8 +403,10 @@ function JobPost() {
                         <div className="col-sm-9">
                           <input
                             type="text"
-                            name="name"
+                            name="industry"
                             className="form-control"
+                            onChange={handleChange}
+                            value={post.industry}
                             placeholder="Marketing and Advertising"
                           />
                         </div>
@@ -305,8 +418,10 @@ function JobPost() {
                         <div className="col-sm-9">
                           <input
                             type="text"
-                            name="name"
+                            name="companyName"
                             className="form-control"
+                            onChange={handleChange}
+                            value={post.companyName}
                             placeholder="ex, Jhon Doe"
                           />
                         </div>
@@ -316,9 +431,11 @@ function JobPost() {
                         <div className="col-sm-9">
                           <input
                             type="email"
-                            name="email"
+                            name="companyEmailAddress"
                             className="form-control"
                             placeholder="ex, jhondoe@mail.com"
+                            onChange={handleChange}
+                            value={post.companyEmailAddress}
                           />
                         </div>
                       </div>
@@ -329,8 +446,10 @@ function JobPost() {
                         <div className="col-sm-9">
                           <input
                             type="text"
-                            name="mobileNumber"
+                            name="companyPhoneNumber"
                             className="form-control"
+                            onChange={handleChange}
+                            value={post.companyPhoneNumber}
                             placeholder="ex, +912457895"
                           />
                         </div>
@@ -342,8 +461,10 @@ function JobPost() {
                         <div className="col-sm-9">
                           <input
                             type="text"
-                            name="address"
+                            name="companyAddress"
                             className="form-control"
+                            onChange={handleChange}
+                            value={post.companyAddress}
                             placeholder="ex, alekdera House, coprotec, usa"
                           />
                         </div>

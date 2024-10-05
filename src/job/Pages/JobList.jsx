@@ -1,24 +1,87 @@
+import React, { useEffect, useState } from "react";
+
+import { config } from "../Components/GeneralFunction";
 import HeaderComp from "../Components/Header";
 import FooterComp from "../Components/Footer";
+import JobTile from "../Components/JobTile";
+import Notify from "../Components/Notify";
+
+import axios from "axios";
 
 function JobLists() {
+  const [jobs, setJobs] = useState([]);
+
+  const [search, setsearch] = useState([]);
+
+  const [query, setQuery] = useState({
+    text: "",
+  });
+
+  const FetchJobs = () => {
+    let url = "http://solidrockschool.com.ng/api/job/index";
+
+    axios
+      .get(url, config)
+      .then((response) => {
+        setJobs(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+
+        Notify({
+          title: "Unable to fetch jobs",
+          msg: error.message,
+          type: "error",
+        });
+      });
+  };
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+
+    const fd = new FormData();
+
+    fd.append("search", query.text);
+
+    let url = "http://solidrockschool.com.ng/api/job/search";
+
+    axios
+      .post(url, fd, config)
+      .then((response) => {
+        setsearch(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+
+        Notify({
+          title: "Nothing to show",
+          msg: error.message,
+          type: "error",
+        });
+      });
+  };
+
+  useEffect(() => {
+    FetchJobs();
+  }, []);
+
   return (
     <div>
       <HeaderComp page="JobList" />
-      
+
       <section className="job-bg page job-list-page">
         <div className="container">
           <div className="breadcrumb-section">
             <ol className="breadcrumb">
               <li>
-                <a href="/">Home</a>
+                <a href="/home">Home</a>
               </li>
               <li>Engineer/Architects</li>
             </ol>
             <h2 className="title">Software Engineer</h2>
           </div>
           <div className="banner-form banner-form-full job-list-form">
-            <form action="#" className="clearfix">
+            <form action="#" className="clearfix" onSubmit={handleSearch}>
               <div className="dropdown category-dropdown">
                 <a data-toggle="dropdown" href="#">
                   <span className="change-text">Job Category</span>{" "}
@@ -43,7 +106,7 @@ function JobLists() {
                 </ul>
               </div>
 
-              <div className="dropdown category-dropdown language-dropdown">
+              <div className="dropdown category-dropdown language-drpdown">
                 <a data-toggle="dropdown" href="#">
                   <span className="change-text">Job Location</span>{" "}
                   <i className="fa fa-angle-down"></i>
@@ -64,6 +127,9 @@ function JobLists() {
                 type="text"
                 className="form-control"
                 placeholder="Type your key word"
+                name="query"
+                value={query.text}
+                onChange={(e) => setQuery({ ...query, text: e.target.value })}
               />
               <button type="submit" className="btn btn-primary" value="Search">
                 Search
@@ -94,7 +160,8 @@ function JobLists() {
                         <div className="panel-body">
                           <h5>
                             <a href="#">
-                              <i className="fa fa-caret-down"></i> All Categories
+                              <i className="fa fa-caret-down"></i> All
+                              Categories
                             </a>
                           </h5>
                           <a href="#">
@@ -580,735 +647,126 @@ function JobLists() {
                       </div>
                     </div>
                   </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/1.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
+
+                  {!query.text == ""
+                    ? search.map((job, index) => (
+                        <div className="job-ad-item">
+                          <div className="item-info">
+                            <div className="item-image-box">
+                              <div className="item-image">
+                                <a href={`/job-details/${job.slug}`}>
+                                  <img
+                                    src="images/job/1.png"
+                                    alt="Image"
+                                    className="img-fluid"
+                                  />
+                                </a>
+                              </div>
+                            </div>
+                            <div className="ad-info">
+                              <span>
+                                <a
+                                  href={`/job-details/${job.slug}`}
+                                  className="title"
+                                >
+                                  {job.title}
+                                </a>{" "}
+                                @ <a href="#">{job.company_name}</a>
+                              </span>
+                              <div className="ad-meta">
+                                <ul>
+                                  <li>
+                                    <a href="#">
+                                      <i
+                                        className="fa fa-map-marker"
+                                        aria-hidden="true"
+                                      ></i>
+                                      {job.location}{" "}
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#">
+                                      <i
+                                        className="fa fa-clock-o"
+                                        aria-hidden="true"
+                                      ></i>
+                                      {job.employment_type}
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#">
+                                      <i
+                                        className="fa fa-money"
+                                        aria-hidden="true"
+                                      ></i>
+                                      ${job.min_salary} - ${job.max_salary}
+                                    </a>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Project Manager
-                          </a>{" "}
-                          @ <a href="#">Dominos Pizza</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
+                      ))
+                    : jobs.map((job, index) => (
+                        <div className="job-ad-item">
+                          <div className="item-info">
+                            <div className="item-image-box">
+                              <div className="item-image">
+                                <a href={`/job-details/${job.slug}`}>
+                                  <img
+                                    src="images/job/1.png"
+                                    alt="Image"
+                                    className="img-fluid"
+                                  />
+                                </a>
+                              </div>
+                            </div>
+                            <div className="ad-info">
+                              <span>
+                                <a
+                                  href={`/job-details/${job.slug}`}
+                                  className="title"
+                                >
+                                  {job.title}
+                                </a>{" "}
+                                @ <a href="#">{job.company_name}</a>
+                              </span>
+                              <div className="ad-meta">
+                                <ul>
+                                  <li>
+                                    <a href="#">
+                                      <i
+                                        className="fa fa-map-marker"
+                                        aria-hidden="true"
+                                      ></i>
+                                      {job.location}{" "}
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#">
+                                      <i
+                                        className="fa fa-clock-o"
+                                        aria-hidden="true"
+                                      ></i>
+                                      {job.employment_type}
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#">
+                                      <i
+                                        className="fa fa-money"
+                                        aria-hidden="true"
+                                      ></i>
+                                      ${job.min_salary} - ${job.max_salary}
+                                    </a>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/2.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Graphics Designer
-                          </a>{" "}
-                          @ <a href="#">AOK Security</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/4.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            CTO
-                          </a>{" "}
-                          @ <a href="#">Volja Events & Entertainment</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/7.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Industrial Manager
-                          </a>{" "}
-                          @ <a href="#">Total Gas</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/8.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Software Engineer
-                          </a>{" "}
-                          @ <a href="#">Dell</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/9.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Human Resource Manager
-                          </a>{" "}
-                          @ <a href="#">Acrobat</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/10.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Program Development
-                          </a>{" "}
-                          @ <a href="#">Adidus</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="ad-section text-center">
-                    <a href="#">
-                      <img
-                        src="images/ads/3.jpg"
-                        alt="Image"
-                        className="img-fluid"
-                      />
-                    </a>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/11.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            CTO
-                          </a>{" "}
-                          @ <a href="#">IBM</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/12.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Human Resource Manager
-                          </a>{" "}
-                          @ <a href="#">BP</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/13.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Industrial Manager
-                          </a>{" "}
-                          @ <a href="#">SaraLee</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/14.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Software Engineer
-                          </a>{" "}
-                          @ <a href="#">Daman</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/15.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Program Development
-                          </a>{" "}
-                          @ <a href="#">Helix</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/16.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            CTO
-                          </a>{" "}
-                          @ <a href="#">Dutrigo</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/17.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Software Engineer
-                          </a>{" "}
-                          @ <a href="#">Costa Rica</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="job-ad-item">
-                    <div className="item-info">
-                      <div className="item-image-box">
-                        <div className="item-image">
-                          <a href="/job-details">
-                            <img
-                              src="images/job/18.png"
-                              alt="Image"
-                              className="img-fluid"
-                            />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="ad-info">
-                        <span>
-                          <a href="/job-details" className="title">
-                            Program Development
-                          </a>{" "}
-                          @ <a href="#">HSBC</a>
-                        </span>
-                        <div className="ad-meta">
-                          <ul>
-                            <li>
-                              <a href="#">
-                                <i
-                                  className="fa fa-map-marker"
-                                  aria-hidden="true"
-                                ></i>
-                                San Francisco, CA, US{" "}
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-clock-o" aria-hidden="true"></i>
-                                Full Time
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#">
-                                <i className="fa fa-money" aria-hidden="true"></i>
-                                $25,000 - $35,000
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      ))}
 
                   <div className="text-center">
                     <ul className="pagination ">

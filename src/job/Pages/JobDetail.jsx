@@ -2,31 +2,61 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import HeaderComp from "../Components/Header";
 import FooterComp from "../Components/Footer";
+import Notify from "../Components/Notify";
 import { useParams } from "react-router-dom";
 import { config, jobData } from "../Components/GeneralFunction";
 
 function JobDetail() {
   let param = useParams();
 
-  const [content, setContent] = useState(jobData[param.id]);
-  console.log(content);
+  // const [content, setContent] = useState(jobData[param.id]);
+  const [content, setContent] = useState([]);
 
   const FetchJobs = () => {
-    let url = "https://get_data_url/" + param.id;
+    let url = `http://solidrockschool.com.ng/api/job/info/${param.id}`;
 
     axios
       .get(url, config)
       .then((response) => {
-        setContent(response.data.data);
+        setContent(response.data.data[0]);
+        console.log(response.data.data[0]);
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
+  const onBookmark = () => {
+    let url = "http://solidrockschool.com.ng/api/job/bookmark";
+    
+    axios
+      .post(url, {
+        ...config,
+        job_code: content.job_code,
+        people_code: content.people_code,
+      })
+      .then((response) => {
+        Notify({
+          title: "Job bookmarked",
+          msg: response.data.message,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+
+        Notify({
+          title: "Unable to bookmark",
+          msg: error.message,
+          type: "danger",
+        });
+      });
+  };
+
   useEffect(() => {
-    // FetchJobs();
+    FetchJobs();
   }, []);
+
   return (
     <div>
       <HeaderComp page="Details" />
@@ -117,7 +147,7 @@ function JobDetail() {
                         {content.title}
                       </a>
                     </span>{" "}
-                    @ <a href="#"> {content.company}</a>
+                    @ <a href="#"> {content.company_name}</a>
                   </span>
                   <div className="ad-meta">
                     <ul>
@@ -137,8 +167,8 @@ function JobDetail() {
                         </a>
                       </li>
                       <li>
-                        <i className="fa fa-money" aria-hidden="true"></i>
-                        ${content.min_pay} - ${content.max_pay}
+                        <i className="fa fa-money" aria-hidden="true"></i>$
+                        {content.min_salary} - ${content.max_salary}
                       </li>
                       <li>
                         <a href="#">
@@ -151,7 +181,7 @@ function JobDetail() {
                           className="fa fa-hourglass-start"
                           aria-hidden="true"
                         ></i>
-                        Application Deadline : Jan 10, 2017
+                        Application Deadline : {content.closing_date}
                       </li>
                     </ul>
                   </div>
@@ -163,7 +193,11 @@ function JobDetail() {
                     <i className="fa fa-briefcase" aria-hidden="true"></i>Apply
                     For This Job
                   </a>
-                  <a href="#" className="btn btn-primary bookmark">
+                  <a
+                    href="#"
+                    className="btn btn-primary bookmark"
+                    onClick={onBookmark}
+                  >
                     <i className="fa fa-bookmark-o" aria-hidden="true"></i>
                     Bookmark
                   </a>
@@ -224,27 +258,7 @@ function JobDetail() {
                   <div className="section job-description">
                     <div className="description-info">
                       <h1>Description</h1>
-                      <p>
-                        <span>
-                          Lorem ipsum dolor sit amet, consectetur adipisicing
-                          elit, sed do eiusmod tempor incididunt ut labore et
-                          dolore magna aliqua. Ut enim ad minim veniam, quis
-                          nostrud exercitation ullamco laboris nisi ut aliquip
-                          ex ea commodo consequat. Duis aute irure dolor in
-                          reprehenderit in voluptate velit esse cillum dolore eu
-                          fugiat nulla pariatur. Excepteur sint occaecat
-                          cupidatat non proident, sunt in culpa qui officia
-                          deserunt mollit anim id est laborum.
-                        </span>
-                      </p>
-                      <p>
-                        Sed ut perspiciatis unde omnis iste natus error sit
-                        voluptatem accusantium doloremque laudantium, totam rem
-                        aperiam, eaque ipsa quae ab illo inventore veritatis et
-                        quasi architecto beatae vitae dicta sunt explicabo. Nemo
-                        enim ipsam voluptatem quia voluptas sit aspernatur aut
-                        odit aut fugit, sed quia consequuntur magni।
-                      </p>
+                      {content.description}
                     </div>
                     <div className="responsibilities">
                       <h1>Key Responsibilities:</h1>
@@ -302,13 +316,13 @@ function JobDetail() {
                         <span className="icon">
                           <i className="fa fa-bolt" aria-hidden="true"></i>
                         </span>
-                        Posted: 1 day ago
+                        Posted: {content.created_at}
                       </li>
                       <li>
                         <span className="icon">
                           <i className="fa fa-user-plus" aria-hidden="true"></i>
                         </span>{" "}
-                        Job poster: <a href="#">Lance Ladaga</a>
+                        Job poster: <a href="#">{content.created_by}</a>
                       </li>
                       <li>
                         <span className="icon">
@@ -323,13 +337,13 @@ function JobDetail() {
                             aria-hidden="true"
                           ></i>
                         </span>
-                        Experience: <a href="#">Entry level</a>
+                        Experience: <a href="#">{content.level}</a>
                       </li>
                       <li>
                         <span className="icon">
                           <i className="fa fa-key" aria-hidden="true"></i>
                         </span>
-                        Job function: Advertising,Design, Art/Creative
+                        Job function: {content.category}
                       </li>
                     </ul>
                   </div>
@@ -337,14 +351,14 @@ function JobDetail() {
                     <h1>Company Info</h1>
                     <ul>
                       <li>
-                        Compnay Name: <a href="#">Dropbox Inc</a>
+                        Compnay Name: <a href="#">{content.company_name}</a>
                       </li>
-                      <li>Address: London, United Kingdom</li>
-                      <li>Compnay SIze: 2k Employee</li>
+                      <li>Address: {content.address}</li>
+                      <li>Compnay Size: 2k Employee</li>
                       <li>
                         Industry: <a href="#">Technology</a>
                       </li>
-                      <li>Phone: +1234 567 8910</li>
+                      <li>Phone: {content.telephone}</li>
                       <li>
                         Email:{" "}
                         <a href="#">
@@ -352,12 +366,12 @@ function JobDetail() {
                             className="__cf_email__"
                             data-cfemail="0960676f66496d7b66796b6671276a6664"
                           >
-                            [email&#160;protected]
+                            {content.email}
                           </span>
                         </a>
                       </li>
                       <li>
-                        Website: <a href="#">www.dropbox.com</a>
+                        Website: <a href="#">{content.website}</a>
                       </li>
                     </ul>
                     <ul className="share-social">
